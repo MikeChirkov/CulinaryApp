@@ -20,4 +20,22 @@ public class MenuActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabLayoutMenu);
         tabLayout.setupWithViewPager(viewPager);
     }
+
+
+  /*  @Override
+    public void onBackPressed()
+    {
+        moveTaskToBack(true);
+        finish();
+        System.runFinalizersOnExit(true);
+        System.exit(0);
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+
+        System.runFinalizersOnExit(true);
+        System.exit(0);
+    }
+    */
 }

@@ -32,7 +32,7 @@ public class MenuFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         int[] imageResId = {
-                R.drawable.profile1, R.drawable.search, R.drawable.create
+                R.drawable.profile, R.drawable.search, R.drawable.create
         };
         //System.err.println("getPageTitle "+ position);
         // генерируем название в зависимости от позиции

@@ -1,5 +1,7 @@
 package com.example.mikechirkov.culinaryapplication;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +29,9 @@ public class CreateAccountActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
+
+
+
         btn_back = (Button)findViewById(R.id.btn_back_LogIn);
 
         btn_back.setOnClickListener(new View.OnClickListener() {
@@ -38,13 +43,19 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         btn_create_account = (Button) findViewById(R.id.btn_create_account);
 
+        field_create_login = findViewById(R.id.field_create_login);
+        field_create_password = findViewById(R.id.field_create_password);
+        field_create_email = findViewById(R.id.field_create_email);
+
+        field_create_login.getBackground().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
+        field_create_password.getBackground().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
+        field_create_email.getBackground().setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP);
+
         btn_create_account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                field_create_login = findViewById(R.id.field_create_login);
-                field_create_password = findViewById(R.id.field_create_password);
-                field_create_email = findViewById(R.id.field_create_email);
+
 
                 System.out.println(field_create_email);
                 System.out.println(field_create_login);
@@ -62,16 +73,17 @@ public class CreateAccountActivity extends AppCompatActivity {
                     try {
                         t.join();
 
-                        Toast toast = Toast.makeText(getApplicationContext(), callBack.getStatus(), Toast.LENGTH_LONG);
-                        toast.show();
-                        Thread.sleep(1000);
 
-                        if (callBack.getStatus().equals("yes"))  //аккаунт успешно создан, выходим в мейн
+                        if (callBack.getStatus().equals("yes"))
+                        {
                             finish();
-
+                            Toast toast = Toast.makeText(getApplicationContext(), "Аккаунт успешно создан!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
 
                     } catch (Exception e) {
-
+                        Toast toast = Toast.makeText(getApplicationContext(), "Такой аккаунт уже создан!", Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
                 else {
@@ -79,9 +91,16 @@ public class CreateAccountActivity extends AppCompatActivity {
                     toast.show();
                 }
 
-                //finish();
             }
         });
+    }
+
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        field_create_email.setText("");
+        field_create_login.setText("");
+        field_create_password.setText("");
     }
 
     class CreateAccount extends Thread {

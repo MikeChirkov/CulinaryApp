@@ -1,12 +1,16 @@
 package com.example.mikechirkov.culinaryapplication;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,41 +19,51 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class PageFragmentsMenu extends Fragment {
     public static final String ARG_PAGE = "ARG_PAGE";
 
     private int mPage;
     private GridView androidGridView;
-    private ListView listView;
+
     private Button btn_check_items;
     private CheckBox checkBox_item;
 
     private SearchView searchProducts;
+    private SearchView searchFavourites;
+
+    private ImageButton menu;
 
     private List<State> states = new ArrayList();
 
-    private List<State> states2 = new ArrayList();
+    private List<State> states_profle = new ArrayList();
 
-    String[] listRecipeName = {
-            "1", "2", "3", "4", "5", "6", "7",
-    };
+    SharedPreferences pref;
+    final String SAVED_LOGIN = "saved_login";
+    final String SAVED_PASSWORD = "saved_password";
 
     ArrayList<String> items = new ArrayList<>();
-    ListView countriesList;
 
-    String[] nameProduct = {
-            "prod1", "prod2", "prod3", "prod4", "prod5", "prod6", "prod7", "prod8", "prod9",
-            "prod10", "prod11", "prod12", "prod13", "prod14", "prod15",
+    ListView listView;
 
-    };
+    ListView listViewProfile;
+
+    ArrayList<State> arrayList;
+
     /*int[] gridViewImageId = {
             R.drawable.pitsa, R.drawable.r2, R.drawable.r3, R.drawable.r4, R.drawable.r5, R.drawable.r6, R.drawable.r7,
     };*/
@@ -70,6 +84,7 @@ public class PageFragmentsMenu extends Fragment {
         if (getArguments() != null) {
             mPage = getArguments().getInt(ARG_PAGE);
         }
+
     }
 
     @Override
@@ -82,15 +97,25 @@ public class PageFragmentsMenu extends Fragment {
         if (mPage == 1) {
             System.err.println("PAGE 1");
 
-           /* view = inflater.inflate(R.layout.fragment_menu_profile, container, false);
+            view = inflater.inflate(R.layout.fragment_menu_profile, container, false);
 
             initGridView();
-            androidGridView = view.findViewById(R.id.gridView);
-            PageFragmentMenuGetUserRecipe adapterViewAndroid = new PageFragmentMenuGetUserRecipe(getContext(), 1, states2);
 
-            androidGridView.setAdapter(adapterViewAndroid);
+            searchFavourites = view.findViewById(R.id.searchFavourites);
 
-            AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
+            menu = view.findViewById(R.id.btn_menu);
+
+            menu.setOnClickListener(viewClickListener);
+
+
+
+            listViewProfile = view.findViewById(R.id.reciepeList);
+
+            final PageFragmentMenuGetUserRecipe adapter = new PageFragmentMenuGetUserRecipe(getContext(), 1, states_profle);
+
+            listViewProfile.setAdapter(adapter);
+
+            /*AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
@@ -105,22 +130,24 @@ public class PageFragmentsMenu extends Fragment {
                     startActivity(intent);
                 }
             };
-            androidGridView.setOnItemClickListener(itemListener);
+            androidGridView.setOnItemClickListener(itemListener);*/
             System.err.println("PAGE 1++++");
             return view;
-*/
+
 
         } else if (mPage == 2) {
 
             System.err.println("PAGE 2");
 
-            /*view = inflater.inflate(R.layout.fragment_menu_select_product_and_search_recipe, container, false);
+            view = inflater.inflate(R.layout.fragment_menu_select_product_and_search_recipe, container, false);
 
             setInitialData();
-            countriesList = view.findViewById(R.id.countriesList);
-            final PageFragmentMenuSelectProductAndSearchRecipe stateAdapter = new PageFragmentMenuSelectProductAndSearchRecipe(getContext(), 1, states);
 
-            countriesList.setAdapter(stateAdapter);
+            listView = view.findViewById(R.id.productList);
+
+            final PageFragmentMenuSelectProductAndSearchRecipe adapter = new PageFragmentMenuSelectProductAndSearchRecipe(getContext(), 1, states);
+
+            listView.setAdapter(adapter);
 
             AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
                 @Override
@@ -132,9 +159,9 @@ public class PageFragmentsMenu extends Fragment {
                             Toast.LENGTH_SHORT).show();
                 }
             };
-            countriesList.setOnItemClickListener(itemListener);
+            listView.setOnItemClickListener(itemListener);
 
-            btn_check_items = view.findViewById(R.id.checkItems);
+           /* btn_check_items = view.findViewById(R.id.checkItems);
             btn_check_items.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -146,8 +173,7 @@ public class PageFragmentsMenu extends Fragment {
                             Toast.LENGTH_SHORT).show();
 
                 }
-            });
-            System.err.println("PAGE 2++++");
+            });*/
 
             searchProducts = view.findViewById(R.id.searchProducts);
 
@@ -158,34 +184,91 @@ public class PageFragmentsMenu extends Fragment {
                 }
 
                 @Override
-                public boolean onQueryTextChange(String newText) {
-
-                    System.out.println(newText + " ----");
-                    stateAdapter.getFilter().filter(newText);
+                public boolean onQueryTextChange(String s) {
+                    if(TextUtils.isEmpty(s)){
+                        adapter.filter("");
+                        listView.clearTextFilter();
+                    }
+                    else{
+                        adapter.filter(s);
+                    }
                     return true;
                 }
             });
 
             return view;
-    */
+
         } else if (mPage == 3) {
 
             System.err.println("PAGE 3");
 
-            /*view = inflater.inflate(R.layout.fragment_page_3, container, false);
-            TextView textView = (TextView) view;
+            view = inflater.inflate(R.layout.fragment_create_reciepe, container, false);
+            /*TextView textView = (TextView) view;
             textView.setText("Fragment test #" + mPage);
 
-            System.err.println("PAGE 3++++");
-            return view;*/
+            System.err.println("PAGE 3++++");*/
+            return view;
         }
 
         System.err.println("PAGE NULL");
         return null;
     }
 
-    private void setInitialData() {
 
+    View.OnClickListener viewClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showPopupMenu(v);
+        }
+    };
+
+    private void showPopupMenu(View v) {
+
+        //PopupMenu popupMenu = new PopupMenu(getContext(), v);
+        Context wrapper = new ContextThemeWrapper(getContext(),R.style.popupMenuStyle);
+        PopupMenu popupMenu = new PopupMenu(wrapper, v);
+
+        popupMenu.inflate(R.menu.popupmenu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.exit_acc:
+                                Toast.makeText(getContext(),
+                                        "Вы вышли из аккаунта",
+                                        Toast.LENGTH_SHORT).show();
+
+                                getActivity().onBackPressed();
+                                
+                                return true;
+                           /* case R.id.menu2:
+                                Toast.makeText(getContext(),
+                                        "Вы выбрали PopupMenu 2",
+                                        Toast.LENGTH_SHORT).show();
+                                return true;*/
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+        popupMenu.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if(id == R.id.searchProducts){
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setInitialData() {
+        states.clear();
         states.add(new State("Продукт1"));
         states.add(new State("Продукт2"));
         states.add(new State("Продукт3"));
@@ -203,24 +286,21 @@ public class PageFragmentsMenu extends Fragment {
         states.add(new State("qw"));
     }
 
-    private void initGridView() {
 
-        /*states2.add(new State("1", R.drawable.pitsa));
-        states2.add(new State("2", R.drawable.r2));
-        states2.add(new State("3", R.drawable.r3));
-        states2.add(new State("4", R.drawable.r4));
-        states2.add(new State("5", R.drawable.r5));
-        states2.add(new State("6", R.drawable.r6));
-        states2.add(new State("7", R.drawable.r7));
-*/
+    private void initGridView() {
+        states_profle.clear();
+        states_profle.add(new State("Спагетти по залупски", R.drawable.r1));
+        states_profle.add(new State("Залупа какая-то", R.drawable.r2));
+        states_profle.add(new State("Пюрешка", R.drawable.r3));
     }
+
 }
 
 
 class State {
 
     private String name; // название
-    private String capital;  // столица
+    private String title;  // столица
     private int flagResource; // ресурс флага
     private boolean flag;//
 
