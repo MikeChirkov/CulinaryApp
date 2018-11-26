@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class CreateAccountActivity extends AppCompatActivity {
@@ -64,26 +66,39 @@ public class CreateAccountActivity extends AppCompatActivity {
                 CallBack callBack = new CallBack();
 
                 Thread t;
-
                 if (!field_create_login.getText().toString().equals("") && !field_create_email.getText().toString().equals("") && !field_create_password.getText().toString().equals("")) {
-
-                    t = new Thread(new CreateAccount(field_create_login.getText().toString(), field_create_password.getText().toString(), field_create_email.getText().toString(), callBack, "createAccount"));
-                    t.start();
-
-                    try {
-                        t.join();
-
-
-                        if (callBack.getStatus().equals("yes"))
-                        {
-                            finish();
-                            Toast toast = Toast.makeText(getApplicationContext(), "Аккаунт успешно создан!", Toast.LENGTH_LONG);
-                            toast.show();
-                        }
-
-                    } catch (Exception e) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Такой аккаунт уже создан!", Toast.LENGTH_LONG);
+                    if (!validateLogIn(field_create_login.getText().toString())) {
+                        field_create_login.setError("Логин должен состоять только из букв латинского алфавита и цифр (первая заглавная, остальные строчные или цифры) и быть длинной более 3 символов.");
+                        field_create_login.requestFocus();
+                    } else if (!validateEmail(field_create_email.getText().toString())) {
+                        field_create_email.setError("Введена некорректная почта");
+                        field_create_email.requestFocus();
+                    } else if (!validatePassword(field_create_password.getText().toString())) {
+                        field_create_password.setError("Пароль должен состоять из не менее 4 символов.");
+                        field_create_password.requestFocus();
+                    }
+                    else {
+                        Toast toast = Toast.makeText(getApplicationContext(), "ВСЁ ОК", Toast.LENGTH_LONG);
                         toast.show();
+
+                       /* t = new Thread(new CreateAccount(field_create_login.getText().toString(), field_create_password.getText().toString(), field_create_email.getText().toString(), callBack, "createAccount"));
+                        t.start();
+
+                        try {
+                            t.join();
+
+
+                            if (callBack.getStatus().equals("yes"))
+                            {
+                                finish();
+                                Toast toast = Toast.makeText(getApplicationContext(), "Аккаунт успешно создан!", Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+
+                        } catch (Exception e) {
+                            Toast toast = Toast.makeText(getApplicationContext(), "Такой аккаунт уже создан!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }*/
                     }
                 }
                 else {
@@ -91,8 +106,41 @@ public class CreateAccountActivity extends AppCompatActivity {
                     toast.show();
                 }
 
+
             }
         });
+    }
+
+
+
+    private boolean validateLogIn(String str) {
+        if(str!=null && str.length() > 3){
+            String logInPattern = "^([A-Z][a-z0-9]+)+$";
+            Pattern pattern = Pattern.compile(logInPattern);
+            Matcher matcher = pattern.matcher(str);
+
+            return matcher.matches();
+        }else{
+            return false;
+        }
+
+    }
+
+    private boolean validateEmail(String str) {
+        String logInPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]{2,}";
+        Pattern pattern = Pattern.compile(logInPattern);
+        Matcher matcher = pattern.matcher(str);
+
+        return matcher.matches();
+    }
+
+    private boolean validatePassword(String str) {
+        if(str!=null && str.length() > 3){
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
     @Override
