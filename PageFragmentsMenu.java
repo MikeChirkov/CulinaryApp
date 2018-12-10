@@ -1,13 +1,28 @@
 package com.example.mikechirkov.culinaryapplication;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,8 +35,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,19 +47,39 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
+import static android.app.Activity.RESULT_OK;
+import static android.widget.Toast.*;
 
 public class PageFragmentsMenu extends Fragment {
+
+    private Uri file;
+
+
+    final String TAG = "myLogs";
+
+    private ImageButton imageButton;
+    private Button addEdit;
+    private Button delEdit;
+    private LinearLayout linearLayout;
+    private int countID = 0;
+
+    ArrayList<EditText> editTexts;
+    ArrayList<LinearLayout> linearLayouts;
+
     public static final String ARG_PAGE = "ARG_PAGE";
 
     private int mPage;
-    private GridView androidGridView;
-
-    private Button btn_check_items;
-    private CheckBox checkBox_item;
 
     private SearchView searchProducts;
     private SearchView searchFavourites;
@@ -84,7 +122,8 @@ public class PageFragmentsMenu extends Fragment {
         if (getArguments() != null) {
             mPage = getArguments().getInt(ARG_PAGE);
         }
-
+        editTexts = new ArrayList<EditText>();
+        linearLayouts = new ArrayList<LinearLayout>();
     }
 
     @Override
@@ -115,7 +154,7 @@ public class PageFragmentsMenu extends Fragment {
 
             listViewProfile.setAdapter(adapter);
 
-            /*AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
+            AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
@@ -127,10 +166,12 @@ public class PageFragmentsMenu extends Fragment {
                     Intent intent = new Intent(getContext(), DescriptionRecipeActivity.class);
                     intent.putExtra("key", selectedState.getNameProduct());
                     intent.putExtra("idRecipe", selectedState.getImgProduct());
+                    intent.putExtra("checkFav", selectedState.getFavour());
                     startActivity(intent);
                 }
             };
-            androidGridView.setOnItemClickListener(itemListener);*/
+            listViewProfile.setOnItemClickListener(itemListener);
+
             System.err.println("PAGE 1++++");
             return view;
 
@@ -155,8 +196,8 @@ public class PageFragmentsMenu extends Fragment {
 
                     // получаем выбранный пункт
                     State selectedState = (State) parent.getItemAtPosition(position);
-                    Toast.makeText(getContext(), "Был выбран пункт " + selectedState.getName() + " = " + selectedState.getFlag(),
-                            Toast.LENGTH_SHORT).show();
+                    makeText(getContext(), "Был выбран пункт " + selectedState.getName() + " = " + selectedState.getFlag(),
+                            LENGTH_SHORT).show();
                 }
             };
             listView.setOnItemClickListener(itemListener);
@@ -203,6 +244,80 @@ public class PageFragmentsMenu extends Fragment {
             System.err.println("PAGE 3");
 
             view = inflater.inflate(R.layout.fragment_create_reciepe, container, false);
+
+            linearLayout = view.findViewById(R.id.linLayout);
+
+            imageButton = view.findViewById(R.id.imageBut);
+            addEdit = view.findViewById(R.id.buttonAdd);
+            delEdit = view.findViewById(R.id.buttonDel);
+
+
+            addEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LinearLayout ll = new LinearLayout(getContext());
+                    EditText ed1 = new EditText(getContext());
+                    EditText ed2 = new EditText(getContext());
+                    EditText ed3 = new EditText(getContext());
+                    ed1.setHint("Ингридиент");
+                    ed2.setHint("Кол-во");
+                    ed3.setHint("Мера");
+                    ed1.setHintTextColor(Color.GRAY);
+                    ed2.setHintTextColor(Color.GRAY);
+                    ed3.setHintTextColor(Color.GRAY);
+                    ed2.setHint("Кол-во");
+                    ed3.setHint("Мера");
+                    ed1.setTextColor(Color.LTGRAY);
+                    ed2.setTextColor(Color.LTGRAY);
+                    ed3.setTextColor(Color.LTGRAY);
+                    ed1.setTextSize(16);
+                    ed2.setTextSize(16);
+                    ed3.setTextSize(16);
+                    ll.setOrientation(LinearLayout.HORIZONTAL);
+                    ed1.setLayoutParams(
+                            new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    0.70f)
+                    );
+                    ed2.setLayoutParams(
+                            new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    0.20f)
+                    );
+                    ed3.setLayoutParams(
+                            new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    0.10f)
+                    );
+
+                    ll.addView(ed1);
+                    editTexts.add(ed1);
+                    ll.addView(ed2);
+                    editTexts.add(ed2);
+                    ll.addView(ed3);
+                    editTexts.add(ed3);
+
+                    linearLayout.addView(ll);
+                    linearLayouts.add(ll);
+                }
+            });
+
+            delEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (linearLayouts.size() > 0) {
+                        // находим в коллекции последний TextView
+                        LinearLayout tv1 = linearLayouts.get(linearLayouts.size() - 1);
+                        // удаляем из диалога
+                        linearLayout.removeView(tv1);
+                        // удаляем из коллекции
+                        linearLayouts.remove(tv1);
+                    }
+                }
+            });
             /*TextView textView = (TextView) view;
             textView.setText("Fragment test #" + mPage);
 
@@ -236,9 +351,9 @@ public class PageFragmentsMenu extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.exit_acc:
-                                Toast.makeText(getContext(),
+                                makeText(getContext(),
                                         "Вы вышли из аккаунта",
-                                        Toast.LENGTH_SHORT).show();
+                                        LENGTH_SHORT).show();
 
                                 getActivity().onBackPressed();
                                 
@@ -284,18 +399,18 @@ public class PageFragmentsMenu extends Fragment {
         states.add(new State("Продукт13"));
         states.add(new State("q"));
         states.add(new State("qw"));
+        states.add(new State("qggdfghfdgdfgdfgdfgfdgfdgfdgfdgfdgfdgfdgfdgfdg"));
     }
 
 
     private void initGridView() {
         states_profle.clear();
-        states_profle.add(new State("Спагетти по залупски", R.drawable.r1));
-        states_profle.add(new State("Залупа какая-то", R.drawable.r2));
-        states_profle.add(new State("Пюрешка", R.drawable.r3));
+        states_profle.add(new State("Спагетти по залупски", R.drawable.r1, true));
+        states_profle.add(new State("Залупа какая-то", R.drawable.r2, true));
+        states_profle.add(new State("Пюрешка", R.drawable.r3, true));
     }
 
 }
-
 
 class State {
 
@@ -303,6 +418,7 @@ class State {
     private String title;  // столица
     private int flagResource; // ресурс флага
     private boolean flag;//
+    private boolean favourRecipe;//
 
     private String nameProduct;
     private int imgProduct;
@@ -313,13 +429,22 @@ class State {
         this.flag = false;
     }
 
-    public State(String nameProduct, int imgProduct) {
+    public State(String nameProduct, int imgProduct, boolean favourRecipe) {
         this.nameProduct = nameProduct;
         this.imgProduct = imgProduct;
+        this.favourRecipe =  favourRecipe;
     }
 
     public String getNameProduct() {
         return this.nameProduct;
+    }
+
+    public boolean getFavour() {
+        return this.favourRecipe;
+    }
+
+    public void setFavour(boolean f) {
+        this.favourRecipe = f;
     }
 
     public void setNameProduct(String name) {
@@ -339,6 +464,7 @@ class State {
     public void setFlag(boolean f) {
         this.flag = f;
     }
+
 
     public boolean getFlag() {
         return this.flag;
