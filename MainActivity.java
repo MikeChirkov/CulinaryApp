@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public void OnClickAutorization(View view) {
 
 
-       /* CallBack callBack = new CallBack();
+        CallBack callBack = new CallBack();
 
 
         if (!field_login.getText().toString().equals("") && !field_password.getText().toString().equals("")) {
@@ -80,14 +80,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            if (callBack.getStatus().equals("yes")) {*/
+            if (callBack.getStatus().equals("yes")) {
                 Intent intent = new Intent(MainActivity.this, MenuActivity.class);
                 startActivity(intent);
                 saveText();
-            /*}
+            }
             else{
-                Toast toast = Toast.makeText(this, callBack.getStatus(), Toast.LENGTH_LONG);
-                toast.show();
+
 
                 field_password.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(this, "Заполните поля", Toast.LENGTH_LONG);
             toast.show();
             //field_password.setBackgroundColor(Color.RED);
-        }*/
+        }
 
     }
 

@@ -78,10 +78,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                         field_create_password.requestFocus();
                     }
                     else {
-                        Toast toast = Toast.makeText(getApplicationContext(), "ВСЁ ОК", Toast.LENGTH_LONG);
-                        toast.show();
 
-                       /* t = new Thread(new CreateAccount(field_create_login.getText().toString(), field_create_password.getText().toString(), field_create_email.getText().toString(), callBack, "createAccount"));
+                        t = new Thread(new CreateAccount(field_create_login.getText().toString(), field_create_password.getText().toString(), field_create_email.getText().toString(), callBack, "createAccount"));
                         t.start();
 
                         try {
@@ -98,7 +96,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             Toast toast = Toast.makeText(getApplicationContext(), "Такой аккаунт уже создан!", Toast.LENGTH_LONG);
                             toast.show();
-                        }*/
+                        }
                     }
                 }
                 else {

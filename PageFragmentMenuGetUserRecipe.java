@@ -31,6 +31,7 @@ public class PageFragmentMenuGetUserRecipe extends ArrayAdapter<State> {
     static class ViewHolder {
         private ImageView imgRecipe;
         private TextView textRecipe;
+        private CheckBox checkFavourRecipe;
     }
 
 
@@ -42,11 +43,14 @@ public class PageFragmentMenuGetUserRecipe extends ArrayAdapter<State> {
         if (convertView == null) {
             view = inflater.inflate(R.layout.fragment_menu_profile_row, null);
 
-            PageFragmentMenuGetUserRecipe.ViewHolder viewHolder = new PageFragmentMenuGetUserRecipe.ViewHolder();
+            final PageFragmentMenuGetUserRecipe.ViewHolder viewHolder = new PageFragmentMenuGetUserRecipe.ViewHolder();
+
+
             viewHolder.imgRecipe = (ImageView) view.findViewById(R.id.imgReciepe);
             viewHolder.textRecipe = (TextView) view.findViewById(R.id.nameReciepe);
-            view.setTag(viewHolder);
 
+
+            view.setTag(viewHolder);
         } else {
             view = convertView;
         }

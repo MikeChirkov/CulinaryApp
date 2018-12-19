@@ -22,7 +22,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
 
-  /*  @Override
+   /* @Override
     public void onBackPressed()
     {
         moveTaskToBack(true);
@@ -37,5 +37,5 @@ public class MenuActivity extends AppCompatActivity {
         System.runFinalizersOnExit(true);
         System.exit(0);
     }
-    */
+*/
 }

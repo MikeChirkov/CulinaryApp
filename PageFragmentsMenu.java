@@ -265,8 +265,6 @@ public class PageFragmentsMenu extends Fragment {
                     ed1.setHintTextColor(Color.GRAY);
                     ed2.setHintTextColor(Color.GRAY);
                     ed3.setHintTextColor(Color.GRAY);
-                    ed2.setHint("Кол-во");
-                    ed3.setHint("Мера");
                     ed1.setTextColor(Color.LTGRAY);
                     ed2.setTextColor(Color.LTGRAY);
                     ed3.setTextColor(Color.LTGRAY);
@@ -294,6 +292,7 @@ public class PageFragmentsMenu extends Fragment {
                     );
 
                     ll.addView(ed1);
+
                     editTexts.add(ed1);
                     ll.addView(ed2);
                     editTexts.add(ed2);

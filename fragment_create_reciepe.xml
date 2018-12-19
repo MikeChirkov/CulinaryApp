@@ -41,44 +41,47 @@
             android:layout_marginEnd="15dp" />
 
         <TextView
-            android:id="@+id/selectImage"
+            android:id="@+id/textNameReciepe"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
 
             android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"
 
-            android:layout_below="@+id/header_text"
+            android:layout_below="@+id/divider4"
 
             android:gravity="center"
 
-            android:text="Выберите изображение: "
+            android:text="Введите название рецепта: "
             android:textColor="@color/gray"
             android:textSize="16sp" />
 
-        <ImageButton
-            android:id="@+id/imageBut"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
+        <EditText
+            android:id="@+id/field_nameReciepe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-            android:layout_below="@+id/selectImage"
+            android:layout_below="@+id/textNameReciepe"
 
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="16dp"
 
-            android:background="@drawable/camera2"
-            />
+            android:ems="10"
+            android:hint="Название рецепта"
+            android:textSize="16sp"
+            android:textColor="@color/gray"
+            android:textColorHint="@color/gray" />
 
         <View
-            android:id="@+id/divider5"
+            android:id="@+id/divider7"
             android:layout_width="wrap_content"
             android:layout_height="1dp"
             android:background="@color/darkgray"
-            android:layout_below="@+id/imageBut"
+            android:layout_below="@+id/field_nameReciepe"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp" />
-
 
         <TextView
             android:id="@+id/selectProducts"
@@ -88,7 +91,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"
 
-            android:layout_below="@+id/divider5"
+            android:layout_below="@+id/divider7"
 
             android:gravity="center"
 
@@ -180,6 +183,17 @@
             android:textColor="@color/gray"
             android:textColorHint="@color/gray" />
 
+        <Button
+            android:id="@+id/buttonCreate"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/field_product"
+            android:text="Создать рецепт"
+            android:textColor="@color/mainBackground"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/button"
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"/>
 
         </RelativeLayout>
 </ScrollView>
